@@ -37,8 +37,11 @@ describe('Table Results', () => {
       cy.get('.bx--document-preview').should('exist');
       cy.get('.bx--document-preview')
         .contains(
-          'This result multiple passages, but you should only be able to see the first one.'
+          "This result has multiple passages, so we'll display them in the order that they're returned."
         )
+        .should('exist');
+      cy.get('.bx--document-preview')
+        .contains('We can display multiple passages that are returned for each document.')
         .should('exist');
 
       // clicking on the close preview button
@@ -56,12 +59,15 @@ describe('Table Results', () => {
       cy.get('.bx--search-result').filter(':contains(table)').should('have.length', 5);
       cy.get('.bx--search-result')
         .contains(
-          'This result multiple passages, but you should only be able to see the first one.'
+          "This result has multiple passages, so we'll display them in the order that they're returned."
         )
         .should('not.exist');
       cy.get('table').contains('This table has an accompanying passage').should('exist');
       cy.get('.bx--search-result')
         .contains('This result has passages and a table.')
+        .should('not.exist');
+      cy.get('.bx--search-result')
+        .contains('We can display multiple passages that are returned for each document.')
         .should('not.exist');
       cy.get('table')
         .contains('You should ONLY see this table when tables-only results are shown.')
@@ -76,8 +82,11 @@ describe('Table Results', () => {
       cy.get('.bx--search-result').filter(':contains(table)').should('have.length', 2);
       cy.get('.bx--search-result')
         .contains(
-          'This result multiple passages, but you should only be able to see the first one.'
+          "This result has multiple passages, so we'll display them in the order that they're returned."
         )
+        .should('exist');
+      cy.get('.bx--search-result')
+        .contains('We can display multiple passages that are returned for each document.')
         .should('exist');
     });
   });
