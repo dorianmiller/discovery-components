@@ -26,16 +26,21 @@ export function useFetchDocumentFile({
     useCallback(
       async (signal: AbortSignal) => {
         if (!file && document && documentProvider) {
+          console.log('dorian start fetch process');
           setIsFetching(true);
           setFetchedFile(undefined);
 
           const fetchData = async () => {
+            console.log('dorian fetchData = async ()');
             const hasFile = await documentProvider.provides(document);
             if (hasFile) {
+              console.log('dorian has file');
               const fetchedData = await documentProvider.get(document);
               if (typeof fetchedData === 'string' || fetchedData instanceof ArrayBuffer) {
+                console.log('dorian, data string or arrayBuffer');
                 return fetchedData;
               } else if (fetchedData?.type === 'pdf') {
+                console.log('dorian, data source');
                 return fetchedData.source;
               }
             }

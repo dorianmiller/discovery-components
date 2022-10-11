@@ -10,12 +10,27 @@
  */
 export class ExampleDocumentProvider {
   async provides(document: DocumentProviderProps) {
-    return document.extracted_metadata.filename === 'Art Effects.pdf';
+    console.log('dorian change', document.extracted_metadata);
+    if (document.extracted_metadata.filename.indexOf('.pdf') >= 0) {
+      // hack to force PDF to render
+      document.extracted_metadata.text_mappings = true;
+      return true;
+    } else {
+      return false;
+    }
+    //return document.extracted_metadata.filename === 'Art Effects Fake Fail.pdf';
   }
 
   async get(document: DocumentProviderProps) {
-    if (document.extracted_metadata.filename === 'Art Effects.pdf') {
-      const res = await fetch('http://localhost:3000/documents/Art Effects.pdf');
+    if (document.extracted_metadata.filename === 'Art Effects Fake Fail.pdf') {
+      //const res = await fetch('http://localhost:3000/documents/Art Effects.pdf');
+      // Force invalid PDF, throws error
+      const res = await fetch('http://localhost:3000/documents/disco-image-input.tiff.pdf');
+      return await res.arrayBuffer();
+    } else {
+      const res = await fetch(
+        'http://localhost:3000/documents/' + document.extracted_metadata.filename
+      );
       return await res.arrayBuffer();
     }
   }

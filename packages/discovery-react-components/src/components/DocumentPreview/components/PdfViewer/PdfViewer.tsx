@@ -45,6 +45,7 @@ export type PdfViewerProps = PdfDisplayProps & {
    * Callback invoked with page count, once `file` has been parsed
    */
   setPageCount?: (count: number) => void;
+
   /**
    * Check if document is loading
    */
@@ -57,6 +58,11 @@ export type PdfViewerProps = PdfDisplayProps & {
    * Callback for text layer info
    */
   setRenderedText?: (info: PdfRenderedText | null) => any;
+
+  /**
+   * Callback invoked to report error in PDF
+   */
+  callbackCurrentErrMsgFromPdf?: (msg: string) => any;
 };
 
 const PdfViewer: FC<PdfViewerProps> = ({
@@ -68,6 +74,7 @@ const PdfViewer: FC<PdfViewerProps> = ({
   textLayerClassName,
   disableTextLayer = false,
   setPageCount,
+  callbackCurrentErrMsgFromPdf,
   setLoading,
   setHideToolbarControls,
   setRenderedText,
@@ -78,7 +85,22 @@ const PdfViewer: FC<PdfViewerProps> = ({
   const [canvasInfo, setCanvasInfo] = useState<CanvasInfo | null>(null);
 
   const loadedFile = useAsyncFunctionCall(
-    useCallback(async () => (file ? await _loadPdf(file) : null), [file])
+    useCallback(async () => {
+      //(file ? await _loadPdf(file) : null)},
+      if (file) {
+        try {
+          console.log('Dorian calling _loadPdf');
+          var obj = await _loadPdf(file);
+          return obj;
+        } catch (e) {
+          console.log('What error is this?', e);
+          callbackCurrentErrMsgFromPdf?.('Error in PDF render');
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }, [file, callbackCurrentErrMsgFromPdf])
   );
   const loadedPage = useAsyncFunctionCall(
     useCallback(
@@ -193,6 +215,7 @@ function usePageCount({
 
 function _loadPdf(data: DocumentFile): Promise<PDFDocumentProxy> {
   const source = toPDFSource(data);
+  console.log('Dorian About to load PDF');
   return PdfjsLib.getDocument(source).promise;
 }
 

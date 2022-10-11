@@ -1,6 +1,7 @@
 import React, { FC, useState, useCallback, useEffect, useRef } from 'react';
 import { QueryResultPassage, QueryTableResult } from 'ibm-watson/discovery/v2';
 import useAsyncFunctionCall from 'utils/useAsyncFunctionCall';
+//import withErrorBoundary, { WithErrorBoundaryProps } from 'utils/hoc/withErrorBoundary';
 import { nonEmpty } from 'utils/nonEmpty';
 import { TextMappings } from '../../types';
 import { spanIntersects } from '../../utils/textSpan';
@@ -34,6 +35,11 @@ type Props = PdfViewerProps &
      * This property overrides `highlights` property if specified
      */
     highlight?: QueryResultPassage | QueryTableResult;
+    /**
+     * Message passed back from PDF Viewer
+     */
+    _errMsgFromPdf?: string | '';
+    callbackPdfNoGood: (msg: string) => any;
   };
 
 /**
@@ -49,7 +55,9 @@ const PdfViewerWithHighlight: FC<Props> = ({
   activeIds,
   _useHtmlBbox,
   _usePdfTextItem,
+  _errMsgFromPdf = '',
   setCurrentPage,
+  callbackPdfNoGood,
   ...rest
 }) => {
   const { scale } = rest;
@@ -82,11 +90,21 @@ const PdfViewerWithHighlight: FC<Props> = ({
     state.activePages,
     state.activeIds,
     setCurrentPage
+    // (msg: string):void => {
+    //   console.log('hook report PDF error', msg);
+    // }
   );
+
+  const setCurrentErrMsgFromPdfConst = useNewCase(_errMsgFromPdf, callbackPdfNoGood);
 
   const highlightReady = !!documentInfo && !!renderedText;
   return (
-    <PdfViewer {...rest} page={currentPage} setRenderedText={setRenderedText}>
+    <PdfViewer
+      {...rest}
+      page={currentPage}
+      setRenderedText={setRenderedText}
+      callbackCurrentErrMsgFromPdf={setCurrentErrMsgFromPdfConst}
+    >
       {({ fitToWidthRatio }: { fitToWidthRatio: number }) => {
         return (
           (state.fields || state.bboxes) && (
@@ -170,6 +188,29 @@ function useHighlightState({
   }, [activeIds, documentInfo, fieldHighlights, queryHighlight]);
 
   return state;
+}
+
+/**
+ * Hook to handle PDF render error
+ */
+
+export function useNewCase(
+  localErrMsgFromPdf: string,
+  localCallbackPdfNoGood?: (msg: string) => any
+) {
+  const [currentErrMsgFromPdf, setCurrentErrMsgFromPdf] = useState(localErrMsgFromPdf);
+  console.log('useNewCase', currentErrMsgFromPdf);
+
+  // Process error message
+  const _previouserrMsgFromPdf = useRef(localErrMsgFromPdf);
+  useEffect(() => {
+    console.log('_previouserrMsgFromPdf', _previouserrMsgFromPdf);
+    console.log('currentErrMsgFromPdf  ', currentErrMsgFromPdf);
+    console.log('localErrMsgFromPdf    ', localErrMsgFromPdf);
+    localCallbackPdfNoGood?.('PDF_ERROR sent from PdfViewerWithHighlight |' + currentErrMsgFromPdf);
+  }, [currentErrMsgFromPdf, setCurrentErrMsgFromPdf, localErrMsgFromPdf, localCallbackPdfNoGood]);
+
+  return setCurrentErrMsgFromPdf;
 }
 
 /**

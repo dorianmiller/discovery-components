@@ -113,6 +113,7 @@ const DocumentPreview: FC<Props> = ({
   const base = `${settings.prefix}--document-preview`;
 
   if (isFetching) {
+    console.log('dorian is fetching');
     return <Loading className={loadingClassName} withOverlay={false} />;
   }
 
@@ -178,6 +179,7 @@ interface PreviewDocumentProps
   loading: boolean;
   hideToolbarControls: boolean;
   setCurrentPage?: (page: number) => void;
+  //setCurrentPage?: (page: number) => {console.log('Document preview, page', page)};
 }
 
 function PreviewDocument({
@@ -195,15 +197,34 @@ function PreviewDocument({
   setCurrentPage,
   fallbackComponent
 }: PreviewDocumentProps): ReactElement | null {
-  const previewType = useMemo(
-    () => (document ? detectPreviewType(document, file, highlight) : null),
-    [document, file, highlight]
-  );
+  const [msgPdfError, setMsgPdfError] = useState('default');
+
+  // notify PDF state
+  useEffect(() => {
+    console.log('DocumentPreview', msgPdfError);
+  }, [msgPdfError, setMsgPdfError]);
+
+  const previewType = useMemo(() => {
+    console.log('dorian useMemo and now...', document, file, highlight, msgPdfError);
+    var answer = document ? detectPreviewType(document, file, highlight) : null;
+    if (msgPdfError.indexOf('Error in PDF render') >= 0) {
+      console.log(
+        'dorian override to TEXT',
+        msgPdfError,
+        '|',
+        msgPdfError.indexOf('Error in PDF render')
+      );
+      answer = 'TEXT';
+    }
+    //return (document ? detectPreviewType(document, file, highlight) : null);
+    return answer;
+  }, [document, file, highlight, msgPdfError]);
 
   if (!document) {
     return null;
   }
-
+  console.log('dorian previewType', previewType);
+  console.log('dorian previewType input ', document, file, highlight, msgPdfError);
   switch (previewType) {
     case 'PDF':
       return (
@@ -213,6 +234,7 @@ function PreviewDocument({
           page={currentPage}
           scale={scale}
           setPageCount={setPdfPageCount}
+          callbackPdfNoGood={setMsgPdfError}
           setLoading={setLoading}
           setHideToolbarControls={setHideToolbarControls}
           highlight={highlight}

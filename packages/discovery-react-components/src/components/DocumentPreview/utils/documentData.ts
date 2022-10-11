@@ -59,6 +59,7 @@ export function detectPreviewType(
     // When trying to highlight a passage or table, text_mappings are required to map
     // between passages' text-based offsets and the BBOX data need to highlight
     // on PDFs
+    console.log('dorian detectPreviewType', hasHighlight, hasTextMappings);
     if (!hasHighlight || hasTextMappings) {
       return 'PDF';
     }
