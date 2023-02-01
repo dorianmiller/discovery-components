@@ -175,7 +175,10 @@ describe('DocumentPreview', () => {
         .mockImplementation(() => Promise.resolve(dummyResponse));
 
       const selectedResult = {
-        document: omit(pdfDocument, 'extracted_metadata.text_mappings'),
+        // Would: test prevents rendering PDF and renders html instead.
+        //document: omit(pdfDocument, 'extracted_metadata.text_mappings'),
+        // Now: render the original PDF
+        document: pdfDocument,
         element: null,
         elementType: null
       };
@@ -184,18 +187,40 @@ describe('DocumentPreview', () => {
         results: [selectedResult]
       };
 
+      var myHook = () => {
+        console.log('myHook got called');
+        return atob(pdfDocContent);
+      };
+
+      // Attempt to define documentProvider
+      context = {
+        //documentProvider: {get:() => Promise.resolve(atob(pdfDocContent)})
+        documentProvider: {
+          get: () => Promise.resolve(myHook()),
+          // get:  () => Promise.resolve(atob('This is invalid pdf. render should fail')),
+          //get: async () => new Promise(resolve => setTimeout(() => resolve(atob(pdfDocContent)), 1))
+          provides: () => Promise.resolve(true)
+        }
+      };
+
       render(
-        <DiscoverySearch
-          searchClient={searchClient}
-          projectId={'PROJECT_ID'}
-          overrideSearchResults={results}
-          overrideSelectedResult={selectedResult}
-        >
-          <DocumentPreview />
-        </DiscoverySearch>
+        wrapWithContext(
+          <DiscoverySearch
+            searchClient={searchClient}
+            projectId={'PROJECT_ID'}
+            overrideSearchResults={results}
+            overrideSelectedResult={selectedResult}
+          >
+            <DocumentPreview />
+          </DiscoverySearch>,
+
+          api,
+          context
+        )
       );
 
-      const elem = await screen.findByText('On 22 December 2008 ART EFFECTS LIMITED', {
+      // On purpose look for "OnXX" so that jest prints debug info.
+      const elem = await screen.findByText('OnXX 22 December 2008 ART EFFECTS LIMITED', {
         exact: false
       });
       expect(elem).toBeInTheDocument();

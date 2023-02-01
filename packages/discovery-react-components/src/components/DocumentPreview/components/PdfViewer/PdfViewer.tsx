@@ -96,6 +96,9 @@ const PdfViewer: FC<PdfViewerProps> = ({
     useCallback(async () => {
       try {
         var promise = file ? await _loadPdf(file) : null;
+        //console.log('components, fake, pdf render error');
+        //setIsPdfRenderError(true);
+        console.log('components, NO, pdf render error');
         setIsPdfRenderError(false);
         return promise;
       } catch (error) {
