@@ -6,10 +6,14 @@ import DiscoveryV2 from 'ibm-watson/discovery/v2';
 import DiscoverySearch from 'components/DiscoverySearch/DiscoverySearch';
 import DocumentPreview from '../DocumentPreview';
 import pdfDocument from '../__fixtures__/Art Effects Koya Creative Base TSA 2008.pdf.json';
+import { document as pdfDocContent } from '../__fixtures__/Art Effects.pdf';
 import passages from '../__fixtures__/passages';
 import 'utils/test/createRange.mock';
 import { SearchApiIFC, SearchContextIFC } from 'components/DiscoverySearch/DiscoverySearch';
 import { wrapWithContext } from 'utils/testingUtils';
+
+// PDF.js uses web streams, which aren't defined in jest/JSDOM
+import 'web-streams-polyfill/es2018';
 
 expect.extend({
   toBeValidHighlight(highlights, length, fieldType, fieldId) {
@@ -211,7 +215,7 @@ describe('DocumentPreview', () => {
             overrideSearchResults={results}
             overrideSelectedResult={selectedResult}
           >
-            <DocumentPreview />
+            <DocumentPreview file={atob(pdfDocContent)} />
           </DiscoverySearch>,
 
           api,

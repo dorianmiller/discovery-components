@@ -62,11 +62,14 @@ export function detectPreviewType(
   const isPassageHighlight = isPassage(highlight);
   const isTableHighlight = isTable(highlight);
 
+  console.log('detectPreviewType check fileType, isPdfRenderError', fileType, isPdfRenderError);
   if (fileType === 'pdf' && file && !isPdfRenderError) {
     // When trying to highlight a passage or table, text_mappings are required to map
     // between passages' text-based offsets and the BBOX data need to highlight
     // on PDFs
+    console.log('detectPreviewType PDF, check one more');
     if (!hasHighlight || hasTextMappings) {
+      console.log('detectPreviewType PDF, for real');
       return 'PDF';
     }
   }
@@ -78,9 +81,11 @@ export function detectPreviewType(
     // (since HTML view cannot display a passage highlight unless the document have text_mappings)
     // When trying to highlight a table, text mappings aren't needed, so display HTML
     if (!hasHighlight || (isPassageHighlight && hasTextMappings) || isTableHighlight) {
+      console.log('detectPreviewType HTML');
       return 'HTML';
     }
   }
 
+  console.log('detectPreviewType TEXT');
   return 'TEXT';
 }

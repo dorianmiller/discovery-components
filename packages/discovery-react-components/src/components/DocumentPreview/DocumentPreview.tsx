@@ -227,7 +227,7 @@ function PreviewDocument({
           highlight={highlight}
           setCurrentPage={setCurrentPage}
           setIsPdfRenderError={setIsPdfRenderError}
-          _isPdfRenderError={false}
+          //_isPdfRenderError={false}
           disableTextLayer={disableTextLayer}
           pdfWorkerUrl={pdfWorkerUrl}
         />

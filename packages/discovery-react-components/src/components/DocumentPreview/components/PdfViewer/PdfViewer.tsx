@@ -58,7 +58,7 @@ export type PdfViewerProps = PdfDisplayProps & {
   /**
    * Callback any errors on render
    */
-  setIsPdfRenderError: (isError: boolean) => void;
+  setIsPdfRenderError?: (isError: boolean) => void;
   /**
    * URL of hosted PDF worker
    */
@@ -99,10 +99,11 @@ const PdfViewer: FC<PdfViewerProps> = ({
         //console.log('components, fake, pdf render error');
         //setIsPdfRenderError(true);
         console.log('components, NO, pdf render error');
-        setIsPdfRenderError(false);
+        setIsPdfRenderError?.(false);
         return promise;
       } catch (error) {
-        setIsPdfRenderError(true);
+        console.log('components, REAL, pdf render error');
+        setIsPdfRenderError?.(true);
         console.error(`Failed to load pdf file: ${error}`);
         return null;
       }
