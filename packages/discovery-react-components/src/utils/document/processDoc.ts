@@ -138,7 +138,7 @@ export async function processDoc(
 
   // kick off parsing
   await parser.parse(htmlContent);
-
+  console.log('ttt processDoc enrichment, doc', enrichment, doc);
   sortFields(enrichment, doc);
   if (options.sections && options.itemMap) {
     addItemMap(doc);
@@ -433,7 +433,7 @@ function closeTagToString(tagName: string): string {
 function sortFields(_enrichments: any, doc: ProcessedDoc): void {
   // shallow copy of object
   const enrichments = Object.assign({}, _enrichments);
-
+  console.log('ttt sortFields enrichments', enrichments);
   for (const fieldType of DOC_ENRICHMENTS) {
     const fields = enrichments[fieldType];
     if (!fields) {

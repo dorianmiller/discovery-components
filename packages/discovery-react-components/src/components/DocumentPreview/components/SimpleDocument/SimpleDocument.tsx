@@ -167,6 +167,8 @@ export const SimpleDocument = forwardRef<any, Props>(
           fragment,
           parentRect,
           fieldType: 'passage',
+          fieldValue: '',
+          facetInfoMap: {},
           fieldId: begin.toString(),
           ...offsets
         });

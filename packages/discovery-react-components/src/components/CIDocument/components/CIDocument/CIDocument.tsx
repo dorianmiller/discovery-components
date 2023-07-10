@@ -203,6 +203,7 @@ const CIDocument: FC<CIDocumentProps> = ({
       if (!didCancel) {
         try {
           const doc = await processDoc(document, { sections: true, itemMap: true });
+          console.log('ttt CIDocument document, doc (not used)', document, doc);
           dispatch({
             type: ActionType.SET,
             data: {
@@ -403,7 +404,7 @@ const CIDocument: FC<CIDocumentProps> = ({
       selectableIds: allClickableIds
     };
   }
-
+  console.log('ttt CIDocument state (not used)', state);
   return (
     <div className={base}>
       <nav className={`${base}__toolbar`} aria-label={messages.navigationToolbarLabel}>

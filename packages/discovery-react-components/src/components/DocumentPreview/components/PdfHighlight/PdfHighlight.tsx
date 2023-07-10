@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useEffect, useRef } from 'react';
 import cx from 'classnames';
 import { settings } from 'carbon-components';
+import { Tooltip } from 'carbon-components-react';
 import { QueryResult } from 'ibm-watson/discovery/v2';
 import { ProcessedDoc } from 'utils/document';
 import { Bbox, TextMappings } from '../../types';
@@ -35,6 +36,7 @@ type Props = PdfDisplayProps &
   };
 
 const base = `${settings.prefix}--document-preview-pdf-viewer-highlight`;
+const baseTooltip = `${settings.prefix}--BREAK-document-preview-tooltip`;
 
 /**
  * Text highlight layer for PdfViewer
@@ -116,24 +118,68 @@ const Highlight: FC<{
     <div data-highlight-id={shape.highlightId}>
       {shape?.boxes.map(item => {
         return (
-          <div
-            key={`${item.bbox[0].toFixed(2)}_${item.bbox[1].toFixed(2)}`}
-            className={cx(
-              `${base}__item`,
-              className,
-              shape.className,
-              active && `${base}__item--active`,
-              active && activeClassName,
-              shape.facetId && `category_${shape.facetId} mf-highlight`,
-              shape.facetId && active && `category_${shape.facetId} mf-active`
-            )}
-            style={{ ...getPositionStyle(item.bbox, scale) }}
-          />
+          <div style={{ ...getPositionStyle(item.bbox, scale), position: 'absolute' }}>
+            <Tooltip
+              // direction="bottom"
+              autoOrientation={true}
+              tabIndex={0}
+              showIcon={false}
+              triggerText={
+                <div
+                  key={`${item.bbox[0].toFixed(2)}_${item.bbox[1].toFixed(2)}`}
+                  className={cx(
+                    `${base}__item`,
+                    className,
+                    shape.className,
+                    active && `${base}__item--active`,
+                    active && activeClassName,
+                    shape.facetId && `category_${shape.facetId} mf-highlight`,
+                    shape.facetId && active && `category_${shape.facetId} mf-active`,
+                    baseTooltip
+                  )}
+                  style={{
+                    width: getPositionStyle(item.bbox, scale).width,
+                    height: getPositionStyle(item.bbox, scale).height
+                  }}
+                />
+              }
+              children={
+                <div>
+                  Tooltip <b style={{ color: 'red' }}>text</b> zzz
+                </div>
+              }
+            />
+          </div>
         );
       })}
     </div>
   );
 };
+
+// Original tooltip
+
+{
+  /* <div
+              key={`${item.bbox[0].toFixed(2)}_${item.bbox[1].toFixed(2)}`}
+              className={cx(
+                `${base}__item`,
+                className,
+                shape.className,
+                active && `${base}__item--active`,
+                active && activeClassName,
+                shape.facetId && `category_${shape.facetId} mf-highlight`,
+                shape.facetId && active && `category_${shape.facetId} mf-active`,
+                baseTooltip
+              )}
+              // style={{ ...getPositionStyle(item.bbox, scale) }}
+            >
+              <div 
+                className={cx(`${baseTooltip}--text`)}
+              >
+                {shape.facetId}{shape.value}
+              </div>
+            </div> */
+}
 
 function getPositionStyle(bbox: Bbox, scale: number, padding: number = 0) {
   const [left, top, right, bottom] = bbox;

@@ -11,6 +11,7 @@ import Section, { OnFieldClickFn } from '../Section/Section';
 import VirtualScroll from '../VirtualScroll/VirtualScroll';
 import { defaultTheme, Theme } from 'utils/theme';
 import { SectionType, ItemMap, HighlightIdsByColor } from 'components/CIDocument/types';
+import { FacetInfoMap } from 'components/DocumentPreview/types';
 
 const baseClassName = `${settings.prefix}--ci-doc-content`;
 
@@ -19,6 +20,7 @@ export interface CIDocumentContentProps {
   styles?: string[];
   sections: SectionType[];
   itemMap: ItemMap;
+  facetInfoMap?: FacetInfoMap;
   highlightedIds?: string[];
   activeIds?: string[];
   activePartIds?: string[];
@@ -43,6 +45,7 @@ const CIDocumentContent: FC<CIDocumentContentProps> = ({
   selectableIds = [],
   activeMetadataIds = [],
   itemMap,
+  facetInfoMap = {},
   width,
   height,
   theme = defaultTheme,
@@ -64,6 +67,7 @@ const CIDocumentContent: FC<CIDocumentContentProps> = ({
   }, [activeIds, activeMetadataIds, activePartIds, itemMap]);
 
   const loading = !sections || sections.length === 0;
+  console.log('ttt CIDocumentContent sections', sections);
   return (
     <div className={cx(baseClassName, className, { skeleton: loading })}>
       {loading ? (
@@ -126,7 +130,11 @@ const CIDocumentContent: FC<CIDocumentContentProps> = ({
               ref={virtualScrollRef}
             >
               {({ index }): ReactElement => (
-                <Section section={sections[index]} onFieldClick={onItemClick} />
+                <Section
+                  section={sections[index]}
+                  onFieldClick={onItemClick}
+                  facetInfoMap={facetInfoMap}
+                />
               )}
             </VirtualScroll>
           )}

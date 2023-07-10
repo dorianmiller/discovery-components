@@ -1,5 +1,6 @@
 import uniqWith from 'lodash/uniqWith';
 import { decodeHTML } from 'entities';
+import { FacetInfoMap } from 'components/DocumentPreview/types';
 
 interface FindOffsetResults {
   beginTextNode: Text;
@@ -117,6 +118,8 @@ interface CreateFieldRectsProps {
   fragment: DocumentFragment;
   parentRect: DOMRect;
   fieldType: string;
+  fieldValue: string;
+  facetInfoMap: FacetInfoMap;
   fieldId: string;
   beginTextNode: Text;
   beginOffset: number;
@@ -130,6 +133,8 @@ interface CreateFieldRectsProps {
  * @param args.fragment DocumentFragment or Node in which to create field rects
  * @param args.parentRect dimensions of parent of field rects
  * @param args.fieldType type string for field rects
+ * @param args.fieldValue text value of the enrichment
+ * @param args.facetInfoMap Facet metadata for tooltip
  * @param args.fieldId id string for field rects
  * @param args.beginTextNode
  * @param args.beginOffset
@@ -140,6 +145,8 @@ export function createFieldRects({
   fragment,
   parentRect,
   fieldType,
+  fieldValue,
+  facetInfoMap,
   fieldId,
   beginTextNode,
   beginOffset,
@@ -157,7 +164,7 @@ export function createFieldRects({
   // create highlight rect(s) inside of a field
   forEachRectInRange(beginTextNode, beginOffset, endTextNode, endOffset, rect => {
     const div = document.createElement('div');
-    div.className = 'field--rect';
+    div.className = 'field--rect bx--document-preview-tooltip';
     div.setAttribute('data-testid', 'field-rect');
     div.setAttribute(
       'style',
@@ -166,6 +173,27 @@ export function createFieldRects({
             width: ${rect.width}px;
             height: ${rect.height}px;`
     );
+    // Nest tooltip. Check HTML and text
+    if (fieldValue && fieldValue !== '') {
+      const divTooltip = document.createElement('div');
+      divTooltip.className = 'bx--document-preview-tooltip--text';
+
+      const textElement = document.createElement('span');
+      textElement.innerText = fieldType + ' ^ ' + fieldValue + ' ';
+      const facetMeta = facetInfoMap[fieldType];
+      if (facetMeta) {
+        textElement.innerText = facetMeta.displayName + '_' + fieldValue;
+        const divColor = document.createElement('div');
+        divColor.setAttribute('style', `border: 2px solid ${facetMeta.color}`);
+        divTooltip.innerText = 'direct!';
+        // divTooltip.appendChild(divColor);
+      } else {
+        console.log('warn', facetMeta, fieldType, facetInfoMap);
+      }
+      divTooltip.innerText = 'direct!';
+      divTooltip.appendChild(textElement);
+      div.appendChild(divTooltip);
+    }
     fieldNode.appendChild(div);
   });
 }

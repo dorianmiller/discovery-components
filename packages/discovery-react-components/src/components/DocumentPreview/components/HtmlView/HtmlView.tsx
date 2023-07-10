@@ -157,7 +157,7 @@ export const HtmlView = forwardRef<any, Props>(
       if (!highlight || !contentNode || !highlightNode) {
         return;
       }
-
+      console.log('ttt HTMLView highlightLocations.forEach', highlightLocations);
       highlightLocations.forEach(location => {
         try {
           const { begin, end } = location;
@@ -173,6 +173,8 @@ export const HtmlView = forwardRef<any, Props>(
             fragment,
             parentRect,
             fieldType: 'highlight',
+            fieldValue: '',
+            facetInfoMap: {},
             fieldId: begin.toString(),
             ...offsets
           });

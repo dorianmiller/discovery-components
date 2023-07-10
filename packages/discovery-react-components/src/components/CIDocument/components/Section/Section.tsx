@@ -21,6 +21,7 @@ import { createFieldRects, findOffsetInDOM } from 'utils/document/documentUtils'
 import { clearNodeChildren } from 'utils/dom';
 import elementFromPoint from 'components/CIDocument/utils/elementFromPoint';
 import { SectionType, Field, Item } from 'components/CIDocument/types';
+import { FacetInfoMap } from 'components/DocumentPreview/types';
 
 export type OnFieldClickFn = (field: Field) => void;
 
@@ -35,9 +36,13 @@ interface SectionProps {
    * Function to call when a field is clicked
    */
   onFieldClick?: OnFieldClickFn;
+  /**
+   * Facet meta info for tooltips
+   */
+  facetInfoMap?: FacetInfoMap;
 }
 
-export const Section: FC<SectionProps> = ({ section, onFieldClick }) => {
+export const Section: FC<SectionProps> = ({ section, onFieldClick, facetInfoMap }) => {
   const { html } = section;
 
   const [hoveredField, setHoveredField] = useState<HTMLElement | null>(null);
@@ -48,7 +53,13 @@ export const Section: FC<SectionProps> = ({ section, onFieldClick }) => {
 
   const createSectionFields = (): void => {
     try {
-      renderSectionFields(section, sectionNode.current, contentNode.current, fieldsNode.current);
+      renderSectionFields(
+        section,
+        sectionNode.current,
+        contentNode.current,
+        fieldsNode.current,
+        facetInfoMap || {}
+      );
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Failed to create section fields:', err);
@@ -162,7 +173,8 @@ function renderSectionFields(
   section: SectionType,
   sectionNode: HTMLElement | null,
   contentNode: HTMLElement | null,
-  fieldsNode: HTMLElement | null
+  fieldsNode: HTMLElement | null,
+  facetInfoMap: FacetInfoMap
 ): void {
   if (!sectionNode || !contentNode || !fieldsNode) {
     return;
@@ -187,11 +199,12 @@ function renderSectionFields(
   const sectionRect = sectionNode.getBoundingClientRect();
   // Store all changes in fragment then add them at the end (to prevent unnecessary reflow)
   const fragment = document.createDocumentFragment();
-
+  console.log('ttt Section section.enrichments', section.enrichments);
   for (const field of section.enrichments) {
     try {
       const fieldType = field.__type;
       const { begin, end } = field.location;
+      const fieldValue = field.value || '';
 
       const offsets = findOffsetInDOM(contentNode, begin, end);
 
@@ -199,6 +212,8 @@ function renderSectionFields(
         fragment,
         parentRect: sectionRect as DOMRect,
         fieldType,
+        fieldValue,
+        facetInfoMap,
         fieldId: getId(field as unknown as Item),
         ...offsets
       });

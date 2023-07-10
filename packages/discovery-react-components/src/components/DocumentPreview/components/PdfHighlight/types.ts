@@ -21,7 +21,7 @@ export type DocumentFieldHighlight = {
   location: Location;
   className?: string;
   facetId?: string;
-  // TODO: add category?
+  value?: string;
 };
 
 /**
@@ -44,6 +44,7 @@ export interface HighlightShape {
   boxes: HighlightShapeBox[];
   className?: string;
   facetId?: string;
+  value?: string;
 }
 
 /**
