@@ -1,3 +1,4 @@
+import React from 'react';
 import uniqWith from 'lodash/uniqWith';
 import { decodeHTML } from 'entities';
 import { FacetInfoMap } from 'components/DocumentPreview/types';
@@ -174,28 +175,118 @@ export function createFieldRects({
             height: ${rect.height}px;`
     );
     // Nest tooltip. Check HTML and text
-    if (fieldValue && fieldValue !== '') {
-      const divTooltip = document.createElement('div');
-      divTooltip.className = 'bx--document-preview-tooltip--text';
 
-      const textElement = document.createElement('span');
-      textElement.innerText = fieldType + ' ^ ' + fieldValue + ' ';
-      const facetMeta = facetInfoMap[fieldType];
-      if (facetMeta) {
-        textElement.innerText = facetMeta.displayName + '_' + fieldValue;
-        const divColor = document.createElement('div');
-        divColor.setAttribute('style', `border: 2px solid ${facetMeta.color}`);
-        divTooltip.innerText = 'direct!';
-        // divTooltip.appendChild(divColor);
-      } else {
-        console.log('warn', facetMeta, fieldType, facetInfoMap);
-      }
-      divTooltip.innerText = 'direct!';
-      divTooltip.appendChild(textElement);
-      div.appendChild(divTooltip);
+    const facetMeta = facetInfoMap[fieldType];
+    const divTooltip = document.createElement('TooltipDefinition');
+    if (facetMeta) {
+      console.log(facetMeta.displayName + '_' + fieldValue);
     }
+    divTooltip.setAttribute('autoOrientation', 'true');
+    divTooltip.setAttribute('showIcon', 'false');
+    divTooltip.setAttribute('tooltipText', 'tooltipText');
+
+    div.appendChild(divTooltip);
+
+    // Nest tooltip. Check HTML and text
+    // if (fieldValue && fieldValue !== '') {
+    //   const divTooltip = document.createElement('div');
+    //   divTooltip.className = 'bx--document-preview-tooltip--text';
+
+    //   const textElement = document.createElement('span');
+    //   textElement.innerText = fieldType + ' ^ ' + fieldValue + ' ';
+    //   const facetMeta = facetInfoMap[fieldType];
+    //   if (facetMeta) {
+    //     textElement.innerText = facetMeta.displayName + '_' + fieldValue;
+    //     const divColor = document.createElement('div');
+    //     divColor.setAttribute('style', `border: 2px solid ${facetMeta.color}`);
+    //     divTooltip.innerText = 'direct!';
+    //     // divTooltip.appendChild(divColor);
+    //   } else {
+    //     console.log('warn', facetMeta, fieldType, facetInfoMap);
+    //   }
+    //   divTooltip.innerText = 'direct!';
+    //   divTooltip.appendChild(textElement);
+    //   div.appendChild(divTooltip);
+    // }
     fieldNode.appendChild(div);
   });
+}
+
+interface CreateFieldRectsJsxProps {
+  parentRect: DOMRect;
+  fieldType: string;
+  fieldValue: string;
+  facetInfoMap: FacetInfoMap;
+  fieldId: string;
+  beginTextNode: Text;
+  beginOffset: number;
+  endTextNode: Text;
+  endOffset: number;
+}
+
+/**
+ * Create "field" rects in the DOM, starting/ending with values of beginTextNode/beginOffset
+ * & endTextNode/endOffset.
+ * @param args.parentRect dimensions of parent of field rects
+ * @param args.fieldType type string for field rects
+ * @param args.fieldValue text value of the enrichment
+ * @param args.facetInfoMap Facet metadata for tooltip
+ * @param args.fieldId id string for field rects
+ * @param args.beginTextNode
+ * @param args.beginOffset
+ * @param args.endTextNode
+ * @param args.endOffset
+ */
+export function createFieldRectsJsx({
+  parentRect,
+  fieldType,
+  fieldValue,
+  facetInfoMap,
+  fieldId,
+  beginTextNode,
+  beginOffset,
+  endTextNode,
+  endOffset
+}: CreateFieldRectsJsxProps): JSX.Element {
+  // create a field container
+  // const fieldNode = document.createElement('div');
+  // fieldNode.className = 'field';
+  // fieldNode.dataset.fieldType = fieldType;
+  // fieldNode.dataset.fieldId = fieldId;
+  // fieldNode.setAttribute('data-testid', `field-${fieldId}`);
+  // fragment.appendChild(fieldNode);
+
+  console.log(`fieldValue && facetInfoMap`, fieldValue && facetInfoMap);
+
+  const fieldList: JSX.Element[] = [];
+  forEachRectInRange(beginTextNode, beginOffset, endTextNode, endOffset, rect => {
+    const ele = (
+      <div
+        className="field--rect bx--document-preview-tooltip"
+        data-testid="field-rect"
+        data-dorian-was-here={true}
+        style={{
+          top: `${rect.top - parentRect.top}px`,
+          left: `${rect.left - parentRect.left}px`,
+          width: `${rect.width}px`,
+          height: `${rect.height}px`
+        }}
+      ></div>
+    );
+    fieldList.push(ele);
+  });
+
+  const fieldNode = (
+    <div
+      className={'field'}
+      data-fieldType={fieldType}
+      data-fieldId={fieldId}
+      data-testid={`field-${fieldId}`}
+    >
+      {fieldList}
+    </div>
+  );
+  return fieldNode;
 }
 
 /**

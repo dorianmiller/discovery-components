@@ -17,8 +17,8 @@ import debounce from 'debounce';
 import { settings } from 'carbon-components';
 import ReactResizeDetector from 'react-resize-detector';
 import { getId } from 'utils/document/idUtils';
-import { createFieldRects, findOffsetInDOM } from 'utils/document/documentUtils';
-import { clearNodeChildren } from 'utils/dom';
+import { createFieldRectsJsx, findOffsetInDOM } from 'utils/document/documentUtils';
+// import { clearNodeChildren } from 'utils/dom';
 import elementFromPoint from 'components/CIDocument/utils/elementFromPoint';
 import { SectionType, Field, Item } from 'components/CIDocument/types';
 import { FacetInfoMap } from 'components/DocumentPreview/types';
@@ -49,17 +49,17 @@ export const Section: FC<SectionProps> = ({ section, onFieldClick, facetInfoMap 
 
   const sectionNode = useRef(null);
   const contentNode = useRef(null);
-  const fieldsNode = useRef(null);
+  // const fieldsNode = useRef(null);
 
   const createSectionFields = (): void => {
     try {
-      renderSectionFields(
-        section,
-        sectionNode.current,
-        contentNode.current,
-        fieldsNode.current,
-        facetInfoMap || {}
-      );
+      // renderSectionFields(
+      //   section,
+      //   sectionNode.current,
+      //   contentNode.current,
+      //   fieldsNode.current,
+      //   facetInfoMap || {}
+      // );
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Failed to create section fields:', err);
@@ -86,7 +86,13 @@ export const Section: FC<SectionProps> = ({ section, onFieldClick, facetInfoMap 
       onMouseLeave={mouseLeaveListener(hoveredField, setHoveredField)}
       onClick={mouseClickListener(onFieldClick)}
     >
-      <div className="fields" ref={fieldsNode} />
+      {/* <div className="fieldsOld" ref={fieldsNode}/> */}
+      {renderSectionFieldsJsx(
+        section,
+        sectionNode.current,
+        contentNode.current,
+        facetInfoMap || {}
+      )}
       <div
         className="content htmlReset htmlOverride"
         ref={contentNode}
@@ -169,22 +175,74 @@ function mouseClickListener(
   return;
 }
 
-function renderSectionFields(
+// function renderSectionFields(
+//   section: SectionType,
+//   sectionNode: HTMLElement | null,
+//   contentNode: HTMLElement | null,
+//   fieldsNode: HTMLElement | null,
+//   facetInfoMap: FacetInfoMap
+// ): void {
+//   if (!sectionNode || !contentNode || !fieldsNode) {
+//     return;
+//   }
+
+//   // Clear out any existing field nodes (from previous creations)
+//   clearNodeChildren(fieldsNode);
+
+//   if (!section.enrichments) {
+//     return;
+//   }
+
+//   // Keep track of the last begin index and sort the enrichments array by begin
+//   // This brings the function down from O(m * n) to O(m + n)
+//   section.enrichments.sort((a, b) => {
+//     // Sort based on begin, and then by end (if begins are equal)
+//     return a.location.begin !== b.location.begin
+//       ? a.location.begin - b.location.begin
+//       : a.location.end - b.location.end;
+//   });
+
+//   const sectionRect = sectionNode.getBoundingClientRect();
+//   // Store all changes in fragment then add them at the end (to prevent unnecessary reflow)
+//   const fragment = document.createDocumentFragment();
+//   console.log('ttt Section section.enrichments', section.enrichments);
+//   for (const field of section.enrichments) {
+//     try {
+//       const fieldType = field.__type;
+//       const { begin, end } = field.location;
+//       const fieldValue = field.value || '';
+
+//       const offsets = findOffsetInDOM(contentNode, begin, end);
+
+//       createFieldRects({
+//         fragment,
+//         parentRect: sectionRect as DOMRect,
+//         fieldType,
+//         fieldValue,
+//         facetInfoMap,
+//         fieldId: getId(field as unknown as Item),
+//         ...offsets
+//       });
+//     } catch (err) {
+//       // Don't log error, since some enrichments are not contained within their sections
+//     }
+//   }
+
+//   fieldsNode.appendChild(fragment);
+// }
+
+function renderSectionFieldsJsx(
   section: SectionType,
   sectionNode: HTMLElement | null,
   contentNode: HTMLElement | null,
-  fieldsNode: HTMLElement | null,
   facetInfoMap: FacetInfoMap
-): void {
-  if (!sectionNode || !contentNode || !fieldsNode) {
-    return;
+): JSX.Element {
+  if (!sectionNode || !contentNode) {
+    return <div data-state="missing sectionNode or contentNode"></div>;
   }
 
-  // Clear out any existing field nodes (from previous creations)
-  clearNodeChildren(fieldsNode);
-
   if (!section.enrichments) {
-    return;
+    return <div data-state="missing enrichments"></div>;
   }
 
   // Keep track of the last begin index and sort the enrichments array by begin
@@ -197,32 +255,37 @@ function renderSectionFields(
   });
 
   const sectionRect = sectionNode.getBoundingClientRect();
-  // Store all changes in fragment then add them at the end (to prevent unnecessary reflow)
-  const fragment = document.createDocumentFragment();
-  console.log('ttt Section section.enrichments', section.enrichments);
-  for (const field of section.enrichments) {
-    try {
-      const fieldType = field.__type;
-      const { begin, end } = field.location;
-      const fieldValue = field.value || '';
+  console.log('jsx Section section.enrichments', section.enrichments);
+  const fieldsEle = (
+    <div className="fields">
+      {section.enrichments.map(field => {
+        const fieldType = field.__type;
+        const { begin, end } = field.location;
+        const offsets = findOffsetInDOM(contentNode, begin, end);
+        const fieldValue = field.value || '';
+        // parentRect: sectionRect as DOMRect,
+        //     fieldType,
+        //     fieldValue,
+        //     facetInfoMap,
+        //     fieldId: getId(field as unknown as Item),
+        //     ...offsets
+        // const elements = (<div></div>);
+        const elements = createFieldRectsJsx({
+          parentRect: sectionRect as DOMRect,
+          fieldType,
+          fieldValue,
+          facetInfoMap,
+          fieldId: getId(field as unknown as Item),
+          ...offsets
+        });
 
-      const offsets = findOffsetInDOM(contentNode, begin, end);
+        return elements;
+      })}
+    </div>
+  );
 
-      createFieldRects({
-        fragment,
-        parentRect: sectionRect as DOMRect,
-        fieldType,
-        fieldValue,
-        facetInfoMap,
-        fieldId: getId(field as unknown as Item),
-        ...offsets
-      });
-    } catch (err) {
-      // Don't log error, since some enrichments are not contained within their sections
-    }
-  }
-
-  fieldsNode.appendChild(fragment);
+  // fieldsNode.appendChild(fragment);
+  return fieldsEle;
 }
 
 function hasTable(html: string): boolean {

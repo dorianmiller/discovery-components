@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
+// import { TooltipDefinition } from 'carbon-components-react';
+// import { Tooltip } from 'carbon-components-react';
 import { QueryResultPassage, QueryTableResult } from 'ibm-watson/discovery/v2';
 import { nonEmpty } from 'utils/nonEmpty';
 import { FacetInfoMap, TextMappings } from '../../types';
@@ -101,6 +103,14 @@ const PdfViewerWithHighlight = forwardRef<any, Props>(
 
     const setCurrentErrMsgFromPdfConst = useIsPfdError(_isPdfRenderError, setIsPdfRenderError);
 
+    // const onTooltipEnter = (rect?: DOMRect, tooltip?: JSX.Element) => {
+    //   console.log('onTooltipOver', rect, tooltip);
+    // };
+
+    // const onTooltipLeave = () => {
+    //   console.log('onTooltipOver');
+    // };
+
     // TODO: Dynamically create a style for every category. Match color of category
     const styleColor = Object.values(facetInfoMap || {})
       .map(facetInfo => {
@@ -118,9 +128,65 @@ const PdfViewerWithHighlight = forwardRef<any, Props>(
       .join('\n');
 
     const highlightReady = !!documentInfo && !!renderedText;
+
+    // <div style={{
+    //   border: '2px solid red',
+    //   width: '50px',
+    //   height: '50px',
+    //   position: 'absolute',
+    //   zIndex: 50,
+    //   top: '300px',
+    //   left: '300px'
+    //   }}>
+    //   {/* <TooltipDefinition
+    //       // direction="bottom"
+    //       autoOrientation={true}
+    //       tabIndex={0}
+    //       showIcon={false}
+    //       open={true}
+    //       direction='top'
+    //       children={
+    //         <div
+    //           style={{
+    //             width: '10px',
+    //             height: '10px',
+    //             border: '2px solid blue'
+    //           }}
+    //         />
+    //       }
+    //       tooltipText={
+    //         <div>
+    //           Tooltip <b style={{ color: 'red' }}>text</b> zzz
+    //         </div>
+    //       }
+    //     /> */}
+    //     <Tooltip
+    //       // direction="bottom"
+    //       autoOrientation={true}
+    //       tabIndex={0}
+    //       showIcon={false}
+    //       // open={true}
+    //       triggerText={
+    //         <div
+    //           style={{
+    //             border: '2px solid blue',
+    //             width: '10px',
+    //             height: '10px',
+    //           }}
+    //         />
+    //       }
+    //       children={
+    //         <div>
+    //           Tooltip <b style={{ color: 'red' }}>text</b> zzz
+    //         </div>
+    //       }
+    //     />
+    //   </div>
+
     return (
       <>
         <style>{styleColor}</style>
+
         <PdfViewer
           ref={scrollRef}
           {...rest}
@@ -139,6 +205,7 @@ const PdfViewerWithHighlight = forwardRef<any, Props>(
                   highlights={state.fields}
                   boxHighlights={state.bboxes}
                   activeIds={state.activeIds}
+                  // onTooltipEnter={onTooltipEnter}
                   {...highlightProps}
                 />
               )

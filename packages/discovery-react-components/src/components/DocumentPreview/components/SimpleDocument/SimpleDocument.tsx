@@ -10,7 +10,7 @@ import { encodeHTML } from 'entities';
 import { settings } from 'carbon-components';
 import { QueryResult, QueryResultPassage, QueryTableResult } from 'ibm-watson/discovery/v2';
 import { clearNodeChildren } from 'utils/dom';
-import { findOffsetInDOM, createFieldRects } from 'utils/document/documentUtils';
+import { findOffsetInDOM, createFieldRectsJsx } from 'utils/document/documentUtils';
 import { isPassage } from '../Highlight/typeUtils';
 import { SearchContext } from 'components/DiscoverySearch/DiscoverySearch';
 import { isJsonFile, isCsvFile } from '../../utils/documentData';
@@ -74,6 +74,7 @@ export const SimpleDocument = forwardRef<any, Props>(
     const highlightRef = useRef<HTMLDivElement>(null);
     const { componentSettings } = useContext(SearchContext);
 
+    let fieldInfo = <div>placeholder</div>;
     let html,
       passage: QueryResultPassage | null = null;
     if (document) {
@@ -163,8 +164,7 @@ export const SimpleDocument = forwardRef<any, Props>(
 
         const fragment = window.document.createDocumentFragment();
         const parentRect = contentNode.getBoundingClientRect() as DOMRect;
-        createFieldRects({
-          fragment,
+        fieldInfo = createFieldRectsJsx({
           parentRect,
           fieldType: 'passage',
           fieldValue: '',
@@ -190,6 +190,7 @@ export const SimpleDocument = forwardRef<any, Props>(
         {html ? (
           <div className={`${baseClass}__wrapper`}>
             <div ref={highlightRef} />
+            {fieldInfo}
             <div
               className={`${baseClass}__content`}
               dangerouslySetInnerHTML={{ __html: html }}

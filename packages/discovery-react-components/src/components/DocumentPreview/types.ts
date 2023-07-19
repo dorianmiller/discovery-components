@@ -78,3 +78,17 @@ export interface FacetInfo {
 export type FacetInfoMap = Record<string, FacetInfo>;
 
 export type DocumentFile = string | TypedArray | DocumentInitParameters;
+
+export interface TooltipInfo {
+  rectTooltipArea: DOMRect;
+  element: JSX.Element;
+  isOpen: boolean;
+}
+
+export interface TooltipAction {
+  mouseAction: string;
+  rect: DOMRect;
+  element: JSX.Element;
+}
+
+export type OnTooltipEnterFn = (mouseAction: String, rect?: DOMRect, tooltip?: JSX.Element) => void;

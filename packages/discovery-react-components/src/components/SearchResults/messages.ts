@@ -43,13 +43,13 @@ export interface Messages {
 
 export const defaultMessages: Messages = {
   collectionLabel: 'Collection:',
-  viewExcerptInDocumentButtonText: 'View passage in document',
-  viewTableInDocumentButtonText: 'View table in document',
-  searchResultsTitle: 'Search results for',
-  tablesOnlyToggleLabelText: 'Show table results only',
-  spellingSuggestionsPrefix: 'Did you mean:',
-  emptyResultContentBodyText: 'Excerpt unavailable.',
-  noResultsFoundTitle: 'No results found',
-  noResultsFoundText: 'Try making your search criteria less specific.',
-  elementTableLabel: 'Table snippet extracted from {documentName}'
+  viewExcerptInDocumentButtonText: 'View passage in document^^',
+  viewTableInDocumentButtonText: 'View table in document^^',
+  searchResultsTitle: 'Search results for^^',
+  tablesOnlyToggleLabelText: 'Show table results only^^',
+  spellingSuggestionsPrefix: 'Did you mean:^^',
+  emptyResultContentBodyText: 'Excerpt unavailable.^^',
+  noResultsFoundTitle: 'No results found^^',
+  noResultsFoundText: 'Try making your search criteria less specific.^^',
+  elementTableLabel: '^^Table snippet extracted from {documentName}'
 };
