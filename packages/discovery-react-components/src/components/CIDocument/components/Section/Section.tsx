@@ -10,7 +10,8 @@ import React, {
   MouseEvent,
   useEffect,
   useRef,
-  useState
+  useState,
+  useCallback
 } from 'react';
 import cx from 'classnames';
 import debounce from 'debounce';
@@ -22,6 +23,10 @@ import { createFieldRectsJsx, findOffsetInDOM } from 'utils/document/documentUti
 import elementFromPoint from 'components/CIDocument/utils/elementFromPoint';
 import { SectionType, Field, Item } from 'components/CIDocument/types';
 import { FacetInfoMap } from 'components/DocumentPreview/types';
+
+import { OnTooltipEnterFn, TooltipAction } from '../../../DocumentPreview/types';
+import HighlightTooltip from '../../../DocumentPreview/components/HighlightTooltip/HighlightTooltip';
+// DocumentPreview/components/HighlightTooltip/HighlightTooltip.tsx
 
 export type OnFieldClickFn = (field: Field) => void;
 
@@ -50,6 +55,26 @@ export const Section: FC<SectionProps> = ({ section, onFieldClick, facetInfoMap 
   const sectionNode = useRef(null);
   const contentNode = useRef(null);
   // const fieldsNode = useRef(null);
+
+  const [tooltipAction, setTooltipAction] = useState<TooltipAction>({
+    mouseAction: 'LEAVE',
+    rect: new DOMRect(),
+    element: <div></div>
+  });
+
+  const onTooltipEnter = useCallback(
+    (mouseAction: string, clickRect?: DOMRect, tooltipEle?: JSX.Element) => {
+      const updateTooltipAction: TooltipAction = {
+        element: tooltipEle || <div></div>,
+        mouseAction: mouseAction || 'LEAVE',
+        rect: clickRect || new DOMRect()
+      };
+      setTooltipAction(updateTooltipAction);
+
+      console.log('onTooltipEnter ', updateTooltipAction);
+    },
+    [setTooltipAction]
+  );
 
   const createSectionFields = (): void => {
     try {
@@ -82,10 +107,11 @@ export const Section: FC<SectionProps> = ({ section, onFieldClick, facetInfoMap 
     <div
       className={cx(`${baseClassName}`, { hasTable: hasTable(html) })}
       ref={sectionNode}
-      onMouseMove={mouseMoveListener(hoveredField, setHoveredField)}
-      onMouseLeave={mouseLeaveListener(hoveredField, setHoveredField)}
+      onMouseMove={mouseMoveListener(hoveredField, setHoveredField, onTooltipEnter)}
+      onMouseLeave={mouseLeaveListener(hoveredField, setHoveredField, onTooltipEnter)}
       onClick={mouseClickListener(onFieldClick)}
     >
+      <HighlightTooltip parentDiv={sectionNode} tooltipAction={tooltipAction} />
       {/* <div className="fieldsOld" ref={fieldsNode}/> */}
       {renderSectionFieldsJsx(
         section,
@@ -105,7 +131,8 @@ export const Section: FC<SectionProps> = ({ section, onFieldClick, facetInfoMap 
 
 function mouseMoveListener(
   hoveredField: HTMLElement | null,
-  setHoveredField: Dispatch<SetStateAction<HTMLElement | null>>
+  setHoveredField: Dispatch<SetStateAction<HTMLElement | null>>,
+  onTooltipAction: OnTooltipEnterFn
 ) {
   return function _mouseMoveListener(event: MouseEvent): void {
     const fieldRect = elementFromPoint(
@@ -119,6 +146,7 @@ function mouseMoveListener(
         hoveredField.classList.remove('hover');
         setHoveredField(null);
         document.body.style.cursor = 'initial';
+        onTooltipAction('LEAVE');
       }
       return;
     }
@@ -133,19 +161,26 @@ function mouseMoveListener(
         fieldNode.classList.add('hover');
       }
       document.body.style.cursor = 'pointer';
+      const element = <div>text tooltip</div>;
+      const fieldNodeContent = fieldNode?.firstElementChild;
+      const rect = fieldNodeContent?.getBoundingClientRect();
+      console.log('text field element box', rect);
+      onTooltipAction('ENTER', rect, element);
     }
   };
 }
 
 function mouseLeaveListener(
   hoveredField: HTMLElement | null,
-  setHoveredField: Dispatch<SetStateAction<HTMLElement | null>>
+  setHoveredField: Dispatch<SetStateAction<HTMLElement | null>>,
+  onTooltipAction: OnTooltipEnterFn
 ) {
   return function _mouseLeaveListener(): void {
     if (hoveredField) {
       hoveredField.classList.remove('hover');
       setHoveredField(null);
       document.body.style.cursor = 'initial';
+      onTooltipAction('LEAVE');
     }
   };
 }

@@ -91,4 +91,4 @@ export interface TooltipAction {
   element: JSX.Element;
 }
 
-export type OnTooltipEnterFn = (mouseAction: String, rect?: DOMRect, tooltip?: JSX.Element) => void;
+export type OnTooltipEnterFn = (mouseAction: string, rect?: DOMRect, tooltip?: JSX.Element) => void;

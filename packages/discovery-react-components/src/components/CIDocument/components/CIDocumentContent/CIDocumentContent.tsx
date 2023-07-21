@@ -6,7 +6,7 @@
 import React, { FC, ReactElement, MutableRefObject, useEffect, useRef } from 'react';
 import cx from 'classnames';
 import { settings } from 'carbon-components';
-import { SkeletonText, TooltipDefinition } from 'carbon-components-react';
+import { SkeletonText } from 'carbon-components-react';
 import Section, { OnFieldClickFn } from '../Section/Section';
 import VirtualScroll from '../VirtualScroll/VirtualScroll';
 import { defaultTheme, Theme } from 'utils/theme';
@@ -88,31 +88,7 @@ const CIDocumentContent: FC<CIDocumentContentProps> = ({
               ])}
             </style>
           )}
-          <div
-            style={{ border: '2px solid red', width: '50px', height: '50px', position: 'absolute' }}
-          >
-            <TooltipDefinition
-              // direction="bottom"
-              autoOrientation={true}
-              tabIndex={0}
-              showIcon={false}
-              open={true}
-              children={
-                <div
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    border: '2px solid blue'
-                  }}
-                />
-              }
-              tooltipText={
-                <div>
-                  Tooltip <b style={{ color: 'red' }}>text</b> zzz
-                </div>
-              }
-            />
-          </div>
+
           {activeIds && activeIds.length > 0 && (
             <>
               <style>

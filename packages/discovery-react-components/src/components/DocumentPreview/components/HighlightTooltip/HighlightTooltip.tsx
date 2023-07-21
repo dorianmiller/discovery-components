@@ -2,16 +2,21 @@ import React, { FC, useState, useEffect } from 'react';
 
 import { Tooltip } from 'carbon-components-react';
 
-import { OnTooltipEnterFn, TooltipInfo, TooltipAction } from '../../types';
+import { TooltipInfo, TooltipAction } from '../../types';
 
 type Props = {
+  /**
+   * Parent div element
+   */
+  parentDiv: React.MutableRefObject<HTMLDivElement | null>;
+
   /**
    * state of the highlight-tootip
    */
   tooltipAction: TooltipAction;
 };
 
-const HighlightTooltip: FC<Props> = ({ tooltipAction }) => {
+const HighlightTooltip: FC<Props> = ({ parentDiv, tooltipAction }) => {
   const [tooltipInfo, setTooltipInfo] = useState<TooltipInfo>({
     rectTooltipArea: new DOMRect(),
     element: <div></div>,
@@ -19,6 +24,7 @@ const HighlightTooltip: FC<Props> = ({ tooltipAction }) => {
   });
 
   useEffect(() => {
+    const highlightDivRect = parentDiv.current?.getBoundingClientRect() || new DOMRect();
     const isOpen = tooltipAction.mouseAction?.localeCompare('LEAVE') !== 0;
     const clickRect = tooltipAction.rect;
     const tooltipRect = new DOMRect(
@@ -84,8 +90,8 @@ const HighlightTooltip: FC<Props> = ({ tooltipAction }) => {
         height: '50px',
         position: 'absolute',
         zIndex: 50,
-        top: tooltipInfo.rect.y,
-        left: tooltipInfo.rect.x,
+        top: tooltipInfo.rectTooltipArea.y,
+        left: tooltipInfo.rectTooltipArea.x,
         pointerEvents: 'none'
       }}
     >
@@ -97,17 +103,17 @@ const HighlightTooltip: FC<Props> = ({ tooltipAction }) => {
         triggerText={
           <div
             style={{
-              border: '2px solid green',
-              width: tooltipInfo.rect.width,
-              height: tooltipInfo.rect.height,
+              border: '2px solid orange',
+              width: tooltipInfo.rectTooltipArea.width,
+              height: tooltipInfo.rectTooltipArea.height,
               pointerEvents: 'none'
             }}
           />
         }
         children={
           <div>
-            Tooltip <b style={{ color: 'red' }}>text</b> {tooltipInfo.isOpen} x {tooltipInfo.rect.x}{' '}
-            zzz
+            Tooltip <b style={{ color: 'red' }}>text</b> {tooltipInfo.isOpen} x{' '}
+            {tooltipInfo.rectTooltipArea.x} zzz
           </div>
         }
       />
