@@ -18,7 +18,7 @@
   "scripts": {
     "prepack": "yarn run build",
     "prepublish": "yarn run build",
-    "test": "cross-env SKIP_PREFLIGHT_CHECK=true CI=1 react-scripts test",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules SKIP_PREFLIGHT_CHECK=true CI=1 react-scripts test",
     "test:coverage": "cross-env CI=1 SKIP_PREFLIGHT_CHECK=true react-scripts test --coverage",
     "test:watch": "cross-env SKIP_PREFLIGHT_CHECK=true react-scripts test --watch",
     "test:debug": "cross-env SKIP_PREFLIGHT_CHECK=true react-scripts --inspect-brk test --runInBand --no-cache",
@@ -69,6 +69,7 @@
     "canvas": "^2.11.2",
     "cross-env": "^7.0.3",
     "css-loader": "^6.9.1",
+    "jest": "27.4.3",
     "madge": "^6.1.0",
     "marked": "^11.1.1",
     "react": "^17.0.2",
@@ -98,6 +99,7 @@
   "jest": {
     "resetMocks": false,
     "displayName": "Disco React Components (Unit)",
+    "transform": {},
     "transformIgnorePatterns": [
       "/!node_modules\\/react-virtualized/"
     ],

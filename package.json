@@ -15,6 +15,11 @@
     "g:eslint": "cd $INIT_CWD && eslint"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.6",
+    "@babel/plugin-transform-react-jsx": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
+    "@babel/preset-react": "^7.24.6",
+    "@babel/preset-typescript": "^7.24.6",
     "@commitlint/cli": "^18.5.0",
     "@commitlint/config-conventional": "^18.5.0",
     "@testing-library/jest-dom": "^5.17.0",
@@ -36,6 +41,7 @@
     "@types/seedrandom": "^3.0.8",
     "@types/testing-library__cypress": "^5.0.13",
     "axios": "^1.6.5",
+    "babel-jest": "^29.7.0",
     "doctoc": "^2.2.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",

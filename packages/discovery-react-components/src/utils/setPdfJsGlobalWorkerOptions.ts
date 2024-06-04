@@ -1,4 +1,5 @@
-import * as PdfjsLib from 'pdfjs-dist';
+// import * as PdfjsLib from 'pdfjs-dist';
+import * as PdfjsLib from 'pdfjs-dist/webpack.mjs';
 
 // Make fields from GlobalWorkerOptions optional
 type GlobalWorkerOptionsDelta = {
